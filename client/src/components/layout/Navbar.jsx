@@ -59,7 +59,7 @@ const Navbar = ({ toggleSidebar }) => {
               className="w-9 h-9 rounded-xl object-cover ring-2 ring-brand-500/10"
             />
           ) : (
-            <div className="w-9 h-9 bg-brand-500/15 dark:bg-brand-550/20 rounded-xl flex items-center justify-center text-brand-650 dark:text-brand-400 font-bold text-sm">
+            <div className="w-9 h-9 bg-brand-500/15 dark:bg-brand-500/20 rounded-xl flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold text-sm">
               {user?.name ? user.name[0].toUpperCase() : 'U'}
             </div>
           )}

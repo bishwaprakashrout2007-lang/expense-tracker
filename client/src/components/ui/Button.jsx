@@ -25,7 +25,7 @@ const Button = ({
     outline:
       'border border-slate-200 hover:bg-slate-50 text-slate-700 dark:border-slate-700 dark:hover:bg-slate-800 dark:text-slate-200 focus:ring-2 focus:ring-slate-500/10 active:scale-[0.98]',
     ghost:
-      'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-350 focus:ring-2 focus:ring-slate-500/10',
+      'hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300 focus:ring-2 focus:ring-slate-500/10',
   };
 
   const sizes = {

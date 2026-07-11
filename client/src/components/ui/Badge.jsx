@@ -16,7 +16,7 @@ const Badge = ({ content }) => {
     Bills: 'bg-orange-50 text-orange-700 dark:bg-orange-500/10 dark:text-orange-400 border-orange-200/50 dark:border-orange-500/20',
     
     // Fallback
-    Other: 'bg-slate-100 text-slate-700 dark:bg-slate-700/50 dark:text-slate-350 border-slate-200 dark:border-slate-700/30',
+    Other: 'bg-slate-100 text-slate-700 dark:bg-slate-700/50 dark:text-slate-300 border-slate-200 dark:border-slate-700/30',
   };
 
   const styling = colorMap[content] || colorMap.Other;

@@ -160,8 +160,8 @@ const Profile = () => {
               />
             </div>
 
-            <div className="border-t border-slate-100 dark:border-slate-850/80 pt-5 mt-5">
-              <h4 className="text-xs font-bold text-slate-400 dark:text-slate-555 uppercase tracking-wider mb-4">
+            <div className="border-t border-slate-100 dark:border-slate-800/80 pt-5 mt-5">
+              <h4 className="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-4">
                 Update Password (Leave blank to keep current)
               </h4>
               
@@ -185,7 +185,7 @@ const Profile = () => {
               </div>
             </div>
 
-            <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-850">
+            <div className="flex justify-end pt-4 border-t border-slate-100 dark:border-slate-800">
               <Button type="submit" loading={loading} className="px-6">
                 Save Changes
               </Button>

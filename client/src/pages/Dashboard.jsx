@@ -175,7 +175,7 @@ const Dashboard = () => {
                     </button>
                   </Link>
                   <Link to="/expenses">
-                    <button className="px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-semibold hover:bg-brand-755">
+                    <button className="px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-semibold hover:bg-brand-700">
                       Add Expense
                     </button>
                   </Link>
@@ -215,8 +215,8 @@ const Dashboard = () => {
                       <td
                         className={`py-3.5 text-right font-bold ${
                           item.type === 'income'
-                            ? 'text-emerald-555 dark:text-emerald-400'
-                            : 'text-rose-550 dark:text-rose-400'
+                            ? 'text-emerald-600 dark:text-emerald-400'
+                            : 'text-rose-600 dark:text-rose-400'
                         }`}
                       >
                         {item.type === 'income' ? '+' : '-'}₹{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

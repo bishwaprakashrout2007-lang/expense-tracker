@@ -10,7 +10,7 @@ const DashboardLayout = ({ children }) => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 dark:bg-slate-950/40">
+    <div className="flex h-screen overflow-hidden bg-alabaster dark:bg-charcoal/40">
       {/* Sidebar */}
       <Sidebar isOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
 
@@ -23,7 +23,7 @@ const DashboardLayout = ({ children }) => {
         <main className="flex-1 overflow-y-auto p-6 relative z-10 animate-fade-in">
           {/* Ambient Background Glow Blobs */}
           <div className="gradient-blob bg-brand-500 top-20 right-20" />
-          <div className="gradient-blob bg-indigo-500 bottom-20 left-20" />
+          <div className="gradient-blob bg-terracotta bottom-20 left-20" />
           
           <div className="max-w-7xl mx-auto relative z-10">
             {children}

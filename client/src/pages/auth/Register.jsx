@@ -38,7 +38,7 @@ const Register = () => {
     setLoading(false);
 
     if (res.success) {
-      toast.success('Welcome to FinanceFlow! Profile created successfully.');
+      toast.success('Welcome to finsift! Profile created successfully.');
       navigate('/');
     } else {
       toast.error(res.message);
@@ -46,19 +46,19 @@ const Register = () => {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden bg-alabaster dark:bg-charcoal">
       {/* Background blobs */}
       <div className="gradient-blob bg-brand-500 -top-40 -left-40 opacity-20" />
-      <div className="gradient-blob bg-indigo-500 -bottom-40 -right-40 opacity-20" />
+      <div className="gradient-blob bg-terracotta -bottom-40 -right-40 opacity-20" />
 
       <Card className="w-full max-w-md relative z-10 p-8">
         {/* Logo */}
         <div className="flex flex-col items-center mb-8">
-          <div className="p-3 bg-gradient-brand rounded-2xl text-white shadow-lg shadow-brand-500/25 mb-3 animate-pulse-subtle">
-            <MdAttachMoney className="w-8 h-8 rotate-12" />
+          <div className="w-16 h-16 flex items-center justify-center bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-slate-200/50 dark:border-slate-700/50 p-2 mb-3">
+            <img src="https://m.media-amazon.com/images/I/614y4xnqgdL.png" alt="finsift logo" className="w-full h-full object-contain" />
           </div>
-          <h2 className="text-2xl font-extrabold text-slate-800 dark:text-white tracking-tight">
-            Finance<span className="text-brand-650 dark:text-brand-450">Flow</span>
+          <h2 className="text-2xl font-extrabold text-charcoal dark:text-white tracking-tight">
+            fin<span className="text-brand-500 dark:text-brand-400">sift</span>
           </h2>
           <p className="text-sm text-slate-400 dark:text-slate-500 font-medium mt-1">
             Create your account to start tracking wealth.

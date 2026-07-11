@@ -31,11 +31,11 @@
 
 /* Custom Gradients */
 .text-gradient-brand {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-indigo-500 dark:from-brand-400 dark:to-indigo-300;
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-terracotta-500 dark:from-brand-400 dark:to-terracotta-500;
 }
 
 .bg-gradient-brand {
-  @apply bg-gradient-to-r from-brand-600 to-indigo-600 dark:from-brand-500 dark:to-indigo-500;
+  @apply bg-gradient-to-r from-brand-600 to-terracotta-500 dark:from-brand-500 dark:to-terracotta-500;
 }
 
 /* Scrollbar styles */

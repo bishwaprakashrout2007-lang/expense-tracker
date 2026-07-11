@@ -187,7 +187,7 @@ const Reports = () => {
 
       {/* Sum aggregates cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        <div className="p-5 bg-white dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-850/30 rounded-2xl">
+        <div className="p-5 bg-white dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-800/30 rounded-2xl">
           <p className="text-2xs font-bold text-slate-400 uppercase tracking-widest mb-1">
             Total Revenue
           </p>
@@ -196,16 +196,16 @@ const Reports = () => {
           </h4>
         </div>
 
-        <div className="p-5 bg-white dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-850/30 rounded-2xl">
+        <div className="p-5 bg-white dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-800/30 rounded-2xl">
           <p className="text-2xs font-bold text-slate-400 uppercase tracking-widest mb-1">
             Total Expenditures
           </p>
-          <h4 className="text-xl font-bold text-rose-500 dark:text-rose-455">
+          <h4 className="text-xl font-bold text-rose-500 dark:text-rose-400">
             {formatCurrency(totals.expense)}
           </h4>
         </div>
 
-        <div className="p-5 bg-white dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-850/30 rounded-2xl">
+        <div className="p-5 bg-white dark:bg-slate-800/60 border border-slate-200/50 dark:border-slate-800/30 rounded-2xl">
           <p className="text-2xs font-bold text-slate-400 uppercase tracking-widest mb-1">
             Savings / Balance
           </p>
@@ -257,9 +257,9 @@ const Reports = () => {
                 {transactions.map((item) => (
                   <tr
                     key={item._id}
-                    className="text-sm text-slate-700 dark:text-slate-350 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
+                    className="text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
                   >
-                    <td className="py-4 font-semibold text-slate-850 dark:text-slate-205">
+                    <td className="py-4 font-semibold text-slate-900 dark:text-slate-200">
                       {item.title}
                     </td>
                     <td className="py-4">
@@ -269,8 +269,8 @@ const Reports = () => {
                       <span
                         className={`text-2xs font-extrabold uppercase px-2 py-0.5 rounded border ${
                           item.type === 'income'
-                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-555/20'
-                            : 'bg-rose-500/10 text-rose-600 dark:text-rose-450 border-rose-555/20'
+                            ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20'
+                            : 'bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20'
                         }`}
                       >
                         {item.type}
@@ -285,7 +285,7 @@ const Reports = () => {
                     </td>
                     <td
                       className={`py-4 text-right font-bold ${
-                        item.type === 'income' ? 'text-emerald-555' : 'text-rose-550'
+                        item.type === 'income' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
                       }`}
                     >
                       ₹{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}

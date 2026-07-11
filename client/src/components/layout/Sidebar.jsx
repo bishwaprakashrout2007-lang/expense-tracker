@@ -43,12 +43,12 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
       >
         {/* Logo */}
         <div className="flex items-center gap-3 px-6 h-20 border-b border-slate-100 dark:border-slate-800/50">
-          <div className="p-2 bg-gradient-brand rounded-xl text-white shadow-md shadow-brand-500/20">
-            <MdAttachMoney className="w-6 h-6 rotate-12" />
+          <div className="w-9 h-9 flex items-center justify-center bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-slate-200/50 dark:border-slate-700/50 p-1">
+            <img src="https://m.media-amazon.com/images/I/614y4xnqgdL.png" alt="finsift logo" className="w-full h-full object-contain" />
           </div>
           <div>
-            <span className="text-lg font-black tracking-tight text-slate-800 dark:text-white">
-              Finance<span className="text-brand-600 dark:text-brand-400">Flow</span>
+            <span className="text-xl font-black tracking-tight text-charcoal dark:text-white">
+              fin<span className="text-brand-500 dark:text-brand-400">sift</span>
             </span>
           </div>
         </div>
@@ -66,7 +66,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                 `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   isActive
                     ? 'bg-brand-600 text-white shadow-lg shadow-brand-500/15 dark:shadow-brand-500/5'
-                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 hover:text-slate-850 dark:hover:text-slate-200'
+                    : 'text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40 hover:text-slate-800 dark:hover:text-slate-200'
                 }`
               }
             >
@@ -87,7 +87,7 @@ const Sidebar = ({ isOpen, toggleSidebar }) => {
                   className="w-10 h-10 rounded-xl object-cover ring-2 ring-brand-500/10"
                 />
               ) : (
-                <div className="w-10 h-10 bg-brand-500/10 dark:bg-brand-500/20 rounded-xl flex items-center justify-center text-brand-600 dark:text-brand-450 font-bold">
+                <div className="w-10 h-10 bg-brand-500/10 dark:bg-brand-500/20 rounded-xl flex items-center justify-center text-brand-600 dark:text-brand-400 font-bold">
                   {user?.name ? user.name[0].toUpperCase() : 'U'}
                 </div>
               )}

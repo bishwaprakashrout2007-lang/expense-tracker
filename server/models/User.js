@@ -5,13 +5,13 @@ const UserSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Please add a name'],
       trim: true,
+      default: '',
     },
     email: {
       type: String,
-      required: [true, 'Please add an email'],
       unique: true,
+      sparse: true,
       trim: true,
       lowercase: true,
       match: [
@@ -19,15 +19,30 @@ const UserSchema = new mongoose.Schema(
         'Please add a valid email',
       ],
     },
+    phone: {
+      type: String,
+      unique: true,
+      sparse: true,
+      trim: true,
+    },
     password: {
       type: String,
-      required: [true, 'Please add a password'],
       minlength: [6, 'Password must be at least 6 characters'],
-      select: false, // Don't return password by default
+      select: false,
+      default: '',
     },
     profilePicture: {
       type: String,
-      default: '', // Store base64 or URL
+      default: '',
+    },
+    provider: {
+      type: String,
+      default: 'email',
+    },
+    firebaseUid: {
+      type: String,
+      unique: true,
+      sparse: true,
     },
   },
   {
@@ -35,17 +50,28 @@ const UserSchema = new mongoose.Schema(
   }
 );
 
-// Hash password before saving
+// Hash password before saving & sanitize unique sparse fields
 UserSchema.pre('save', async function (next) {
-  if (!this.isModified('password')) {
-    next();
+  // Convert empty strings to undefined to prevent duplicate key errors with sparse unique indexes
+  if (this.phone === '') {
+    this.phone = undefined;
   }
+  if (this.firebaseUid === '') {
+    this.firebaseUid = undefined;
+  }
+
+  if (!this.isModified('password') || !this.password) {
+    return next();
+  }
+
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
+  next();
 });
 
 // Compare password
 UserSchema.methods.matchPassword = async function (enteredPassword) {
+  if (!this.password) return false;
   return await bcrypt.compare(enteredPassword, this.password);
 };
 

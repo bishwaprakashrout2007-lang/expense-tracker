@@ -4,7 +4,7 @@ const ProgressBar = ({ value, max = 100, label, suffix = '%' }) => {
   const percentage = Math.min(100, Math.max(0, max > 0 ? (value / max) * 100 : 0));
   
   const getColor = (pct) => {
-    if (pct >= 100) return 'bg-rose-550 dark:bg-rose-500';
+    if (pct >= 100) return 'bg-rose-500 dark:bg-rose-500';
     if (pct >= 85) return 'bg-amber-500 dark:bg-amber-500';
     return 'bg-emerald-500 dark:bg-emerald-500';
   };

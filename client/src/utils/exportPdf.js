@@ -5,12 +5,12 @@ export const exportToPdf = (reportType, data, monthName, yearName, totals) => {
   const doc = new jsPDF();
   
   // App branding color
-  const primaryColor = [99, 102, 241]; // Brand brand-500 (#6366f1)
+  const primaryColor = [135, 154, 119]; // Sage Green (#879A77)
 
   // Header Title
   doc.setFontSize(20);
   doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
-  doc.text('FinanceFlow', 14, 20);
+  doc.text('finsift', 14, 20);
   
   doc.setFontSize(10);
   doc.setTextColor(100, 116, 139);
@@ -80,10 +80,10 @@ export const exportToPdf = (reportType, data, monthName, yearName, totals) => {
     doc.setFontSize(8);
     doc.setTextColor(148, 163, 184);
     doc.text(`Page ${i} of ${pageCount}`, 14, doc.internal.pageSize.height - 10);
-    doc.text('FinanceFlow SaaS - linkedin.com/in/financeflow', 130, doc.internal.pageSize.height - 10);
+    doc.text('finsift - Personal Wealth Dashboard', 130, doc.internal.pageSize.height - 10);
   }
 
   // Save the PDF file
-  const filename = `FinanceFlow_${reportType}_Report_${monthName}_${yearName}.pdf`.replace(/\s+/g, '_');
+  const filename = `finsift_${reportType}_Report_${monthName}_${yearName}.pdf`.replace(/\s+/g, '_');
   doc.save(filename);
 };

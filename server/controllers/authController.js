@@ -8,6 +8,16 @@ const generateToken = (id) => {
   });
 };
 
+const buildUserResponse = (user) => ({
+  success: true,
+  _id: user._id,
+  name: user.name,
+  email: user.email,
+  phone: user.phone,
+  profilePicture: user.profilePicture,
+  token: generateToken(user._id),
+});
+
 // @desc    Register a new user
 // @route   POST /api/auth/register
 // @access  Public
@@ -30,17 +40,11 @@ const registerUser = async (req, res, next) => {
       name,
       email,
       password,
+      provider: 'email',
     });
 
     if (user) {
-      res.status(201).json({
-        success: true,
-        _id: user._id,
-        name: user.name,
-        email: user.email,
-        profilePicture: user.profilePicture,
-        token: generateToken(user._id),
-      });
+      res.status(201).json(buildUserResponse(user));
     } else {
       res.status(400).json({
         success: false,
@@ -62,7 +66,7 @@ const loginUser = async (req, res, next) => {
     // Check for user email and select password field
     const user = await User.findOne({ email }).select('+password');
 
-    if (!user) {
+    if (!user || !user.password) {
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password',
@@ -79,14 +83,49 @@ const loginUser = async (req, res, next) => {
       });
     }
 
-    res.json({
-      success: true,
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      profilePicture: user.profilePicture,
-      token: generateToken(user._id),
-    });
+    res.json(buildUserResponse(user));
+  } catch (error) {
+    next(error);
+  }
+};
+
+const syncFirebaseUser = async (req, res, next) => {
+  try {
+    const { name, email, phone, profilePicture, firebaseUid, provider } = req.body;
+
+    if (!firebaseUid) {
+      return res.status(400).json({
+        success: false,
+        message: 'Firebase UID is required',
+      });
+    }
+
+    let user = await User.findOne({ firebaseUid });
+
+    if (!user) {
+      user = await User.findOne({ email }) || (phone ? await User.findOne({ phone }) : null);
+    }
+
+    if (!user) {
+      user = await User.create({
+        name,
+        email,
+        phone,
+        profilePicture,
+        provider: provider || 'firebase',
+        firebaseUid,
+      });
+    } else {
+      if (name) user.name = name;
+      if (email) user.email = email;
+      if (phone) user.phone = phone;
+      if (profilePicture) user.profilePicture = profilePicture;
+      if (provider) user.provider = provider;
+      user.firebaseUid = firebaseUid;
+      await user.save();
+    }
+
+    res.json(buildUserResponse(user));
   } catch (error) {
     next(error);
   }
@@ -163,6 +202,7 @@ const updateUserProfile = async (req, res, next) => {
 module.exports = {
   registerUser,
   loginUser,
+  syncFirebaseUser,
   getUserProfile,
   updateUserProfile,
 };

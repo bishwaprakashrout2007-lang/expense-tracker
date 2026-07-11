@@ -74,6 +74,37 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Sync Firebase/OTP/Google auth user
+  const loginWithFirebase = async (firebaseUser, provider = 'firebase') => {
+    try {
+      const res = await api.post('/auth/firebase', {
+        firebaseUid: firebaseUser.uid,
+        name: firebaseUser.displayName || firebaseUser.name || '',
+        email: firebaseUser.email || '',
+        phone: firebaseUser.phoneNumber || '',
+        profilePicture: firebaseUser.photoURL || '',
+        provider,
+      });
+
+      if (res.data.success) {
+        localStorage.setItem('token', res.data.token);
+        setUser({
+          _id: res.data._id,
+          name: res.data.name,
+          email: res.data.email,
+          phone: res.data.phone,
+          profilePicture: res.data.profilePicture,
+        });
+        return { success: true };
+      }
+
+      return { success: false, message: res.data.message || 'Firebase login failed' };
+    } catch (error) {
+      const message = error.response?.data?.message || 'Firebase login failed';
+      return { success: false, message };
+    }
+  };
+
   // Logout User
   const logout = () => {
     localStorage.removeItem('token');
@@ -109,6 +140,7 @@ export const AuthProvider = ({ children }) => {
         loading,
         register,
         login,
+        loginWithFirebase,
         logout,
         updateProfile,
         isAuthenticated: !!user,

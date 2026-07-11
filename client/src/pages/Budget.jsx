@@ -168,7 +168,7 @@ const Budget = () => {
       {budgetStatus && (
         <div className="space-y-3">
           {budgetStatus.totalExceeded && (
-            <div className="flex gap-3 p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-800 dark:text-rose-455 font-bold text-sm items-center animate-pulse-subtle">
+            <div className="flex gap-3 p-4 rounded-xl border border-rose-500/20 bg-rose-500/5 text-rose-800 dark:text-rose-400 font-bold text-sm items-center animate-pulse-subtle">
               <MdWarning className="w-5 h-5 text-rose-500 flex-shrink-0" />
               <div>
                 Overall Budget Alert: Your spending this month ({formatCurrency(budgetStatus.totalSpent)}) has exceeded your overall budget limit ({formatCurrency(budgetStatus.totalBudget)}).
@@ -177,7 +177,7 @@ const Budget = () => {
           )}
 
           {exceededCategories.length > 0 && (
-            <div className="flex gap-3 p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-800 dark:text-amber-350 font-bold text-sm items-start">
+            <div className="flex gap-3 p-4 rounded-xl border border-amber-500/20 bg-amber-500/5 text-amber-800 dark:text-amber-300 font-bold text-sm items-start">
               <MdNotificationsActive className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
               <div>
                 <p className="font-bold mb-1">Category Thresholds Exceeded:</p>
@@ -257,7 +257,7 @@ const Budget = () => {
             <div className="space-y-5">
               {/* Overall Circular or display details */}
               <div className="text-center py-6 bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl border border-slate-100 dark:border-slate-800/30">
-                <p className="text-xs font-bold text-slate-400 dark:text-slate-555 uppercase tracking-wider">
+                <p className="text-xs font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider">
                   Overall Budget Limit
                 </p>
                 <h3 className="text-3xl font-black text-slate-800 dark:text-white mt-1">

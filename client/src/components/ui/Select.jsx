@@ -32,7 +32,7 @@ const Select = React.forwardRef(
           <select
             id={id}
             ref={ref}
-            className={`w-full glass-input px-4 py-3 text-sm focus:ring-2 focus:ring-brand-500/20 text-slate-850 dark:text-slate-100 appearance-none bg-no-repeat bg-[right_1rem_center] cursor-pointer ${
+            className={`w-full glass-input px-4 py-3 text-sm focus:ring-2 focus:ring-brand-500/20 text-slate-800 dark:text-slate-100 appearance-none bg-no-repeat bg-[right_1rem_center] cursor-pointer ${
               icon ? 'pl-11' : ''
             } ${
               error

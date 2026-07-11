@@ -162,7 +162,7 @@ const Analytics = () => {
                   return (
                     <tr
                       key={index}
-                      className="text-sm text-slate-700 dark:text-slate-350 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
+                      className="text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
                     >
                       <td className="py-4 font-semibold text-slate-800 dark:text-slate-200">
                         {item.month}

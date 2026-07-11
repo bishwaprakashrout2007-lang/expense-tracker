@@ -218,9 +218,9 @@ const Expenses = () => {
                 {expenses.map((item) => (
                   <tr
                     key={item._id}
-                    className="text-sm text-slate-700 dark:text-slate-355 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
+                    className="text-sm text-slate-700 dark:text-slate-300 hover:bg-slate-50/50 dark:hover:bg-slate-800/20 transition-colors"
                   >
-                    <td className="py-4 font-semibold text-slate-850 dark:text-slate-205">
+                    <td className="py-4 font-semibold text-slate-900 dark:text-slate-200">
                       {item.title}
                     </td>
                     <td className="py-4">
@@ -233,10 +233,10 @@ const Expenses = () => {
                         year: 'numeric',
                       })}
                     </td>
-                    <td className="py-4 text-xs text-slate-450 dark:text-slate-400 max-w-xs truncate">
+                    <td className="py-4 text-xs text-slate-500 dark:text-slate-400 max-w-xs truncate">
                       {item.description || <span className="text-slate-300 dark:text-slate-600">-</span>}
                     </td>
-                    <td className="py-4 text-right font-bold text-rose-550 dark:text-rose-450">
+                    <td className="py-4 text-right font-bold text-rose-600 dark:text-rose-400">
                       ₹{item.amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                     </td>
                     <td className="py-4 text-center">
@@ -250,7 +250,7 @@ const Expenses = () => {
                         </button>
                         <button
                           onClick={() => openDeleteModal(item._id)}
-                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-550 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
+                          className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-500/10 transition-colors"
                           title="Delete"
                         >
                           <MdOutlineDeleteOutline className="w-4 h-4" />

@@ -48,6 +48,6 @@ export const exportToExcel = (reportType, data, monthName, yearName, totals) => 
   worksheet['!cols'] = wscols;
 
   // Save the Excel file
-  const filename = `FinanceFlow_${reportType}_Report_${monthName}_${yearName}.xlsx`.replace(/\s+/g, '_');
+  const filename = `finsift_${reportType}_Report_${monthName}_${yearName}.xlsx`.replace(/\s+/g, '_');
   XLSX.writeFile(workbook, filename);
 };

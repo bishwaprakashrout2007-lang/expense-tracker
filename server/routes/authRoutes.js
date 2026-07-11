@@ -3,6 +3,7 @@ const { check } = require('express-validator');
 const {
   registerUser,
   loginUser,
+  syncFirebaseUser,
   getUserProfile,
   updateUserProfile,
 } = require('../controllers/authController');
@@ -30,6 +31,15 @@ router.post(
     validate,
   ],
   loginUser
+);
+
+router.post(
+  '/firebase',
+  [
+    check('firebaseUid', 'Firebase UID is required').notEmpty(),
+    validate,
+  ],
+  syncFirebaseUser
 );
 
 router.route('/profile')
