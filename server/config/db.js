@@ -40,7 +40,13 @@ if (admin.apps.length === 0) {
 
     if (projectId && clientEmail && privateKey) {
       try {
-        const formattedPrivateKey = privateKey.replace(/\\n/g, '\n');
+        let formattedPrivateKey = privateKey.trim();
+        // Remove surrounding double quotes if they were pasted from JSON
+        if (formattedPrivateKey.startsWith('"') && formattedPrivateKey.endsWith('"')) {
+          formattedPrivateKey = formattedPrivateKey.slice(1, -1);
+        }
+        formattedPrivateKey = formattedPrivateKey.replace(/\\n/g, '\n');
+        
         admin.initializeApp({
           credential: admin.credential.cert({
             projectId,
