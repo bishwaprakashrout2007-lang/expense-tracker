@@ -2,18 +2,31 @@ const admin = require('firebase-admin');
 const path = require('path');
 const fs = require('fs');
 
-const serviceAccountPath = path.join(__dirname, 'serviceAccountKey.json');
+const pathsToCheck = [
+  path.join(__dirname, 'serviceAccountKey.json'),                 // server/config/serviceAccountKey.json
+  path.join(__dirname, '..', 'serviceAccountKey.json'),            // server/serviceAccountKey.json
+  path.join(__dirname, '..', '..', 'serviceAccountKey.json')      // root/serviceAccountKey.json
+];
+
+let serviceAccountPath = '';
+for (const p of pathsToCheck) {
+  if (fs.existsSync(p)) {
+    serviceAccountPath = p;
+    break;
+  }
+}
+
 let appInitialized = false;
 
 // Check if Firebase admin app is already initialized
 if (admin.apps.length === 0) {
-  if (fs.existsSync(serviceAccountPath)) {
+  if (serviceAccountPath) {
     try {
       const serviceAccount = require(serviceAccountPath);
       admin.initializeApp({
         credential: admin.credential.cert(serviceAccount)
       });
-      console.log('Firebase Connected (Service Account JSON File)');
+      console.log(`Firebase Connected (Service Account JSON File loaded from: ${path.basename(serviceAccountPath)})`);
       appInitialized = true;
     } catch (error) {
       console.error(`Failed to initialize Firebase with serviceAccountKey.json: ${error.message}`);
