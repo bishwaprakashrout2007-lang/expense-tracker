@@ -1,5 +1,4 @@
-const Income = require('../models/Income');
-const Expense = require('../models/Expense');
+const { db } = require('../config/db');
 
 // Helper to get start and end dates of a given month and year
 const getMonthDateRange = (month, year) => {
@@ -13,16 +12,31 @@ const getMonthDateRange = (month, year) => {
 // @access  Private
 const getDashboardSummary = async (req, res, next) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user._id.toString();
     const now = new Date();
     const currentMonth = now.getMonth() + 1;
     const currentYear = now.getFullYear();
 
     const { startDate: thisMonthStart, endDate: thisMonthEnd } = getMonthDateRange(currentMonth, currentYear);
     
-    // Overall Stats
-    const incomes = await Income.find({ userId });
-    const expenses = await Expense.find({ userId });
+    // Overall Stats - fetch all incomes & expenses for this user
+    const incomesSnapshot = await db.collection('incomes')
+      .where('userId', '==', userId)
+      .get();
+      
+    const expensesSnapshot = await db.collection('expenses')
+      .where('userId', '==', userId)
+      .get();
+
+    let incomes = [];
+    incomesSnapshot.forEach((doc) => {
+      incomes.push({ _id: doc.id, ...doc.data() });
+    });
+
+    let expenses = [];
+    expensesSnapshot.forEach((doc) => {
+      expenses.push({ _id: doc.id, ...doc.data() });
+    });
 
     const totalIncome = incomes.reduce((sum, item) => sum + item.amount, 0);
     const totalExpense = expenses.reduce((sum, item) => sum + item.amount, 0);
@@ -32,8 +46,15 @@ const getDashboardSummary = async (req, res, next) => {
     const savingsPercentage = totalIncome > 0 ? Math.max(0, parseFloat(((currentBalance / totalIncome) * 100).toFixed(2))) : 0;
 
     // Current Month Stats
-    const thisMonthIncomes = incomes.filter(inc => inc.date >= thisMonthStart && inc.date <= thisMonthEnd);
-    const thisMonthExpenses = expenses.filter(exp => exp.date >= thisMonthStart && exp.date <= thisMonthEnd);
+    const thisMonthIncomes = incomes.filter(inc => {
+      const d = new Date(inc.date);
+      return d >= thisMonthStart && d <= thisMonthEnd;
+    });
+    
+    const thisMonthExpenses = expenses.filter(exp => {
+      const d = new Date(exp.date);
+      return d >= thisMonthStart && d <= thisMonthEnd;
+    });
 
     const monthlyIncome = thisMonthIncomes.reduce((sum, item) => sum + item.amount, 0);
     const monthlyExpense = thisMonthExpenses.reduce((sum, item) => sum + item.amount, 0);
@@ -136,9 +157,28 @@ const getDashboardSummary = async (req, res, next) => {
 // @access  Private
 const getMonthlyAnalytics = async (req, res, next) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user._id.toString();
     const result = [];
     const now = new Date();
+
+    // Fetch all incomes and expenses for user first to optimize inside the loop
+    const incomesSnapshot = await db.collection('incomes')
+      .where('userId', '==', userId)
+      .get();
+      
+    const expensesSnapshot = await db.collection('expenses')
+      .where('userId', '==', userId)
+      .get();
+
+    let allIncomes = [];
+    incomesSnapshot.forEach((doc) => {
+      allIncomes.push(doc.data());
+    });
+
+    let allExpenses = [];
+    expensesSnapshot.forEach((doc) => {
+      allExpenses.push(doc.data());
+    });
 
     // Loop through past 6 months (including current month)
     for (let i = 5; i >= 0; i--) {
@@ -149,14 +189,14 @@ const getMonthlyAnalytics = async (req, res, next) => {
 
       const { startDate, endDate } = getMonthDateRange(m, y);
 
-      const incomes = await Income.find({
-        userId,
-        date: { $gte: startDate, $lte: endDate },
+      const incomes = allIncomes.filter(inc => {
+        const date = new Date(inc.date);
+        return date >= startDate && date <= endDate;
       });
 
-      const expenses = await Expense.find({
-        userId,
-        date: { $gte: startDate, $lte: endDate },
+      const expenses = allExpenses.filter(exp => {
+        const date = new Date(exp.date);
+        return date >= startDate && date <= endDate;
       });
 
       const incomeTotal = incomes.reduce((sum, item) => sum + item.amount, 0);
@@ -184,7 +224,7 @@ const getMonthlyAnalytics = async (req, res, next) => {
 // @access  Private
 const getCategoryBreakdown = async (req, res, next) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user._id.toString();
     const { month, year } = req.query;
 
     const now = new Date();
@@ -193,9 +233,17 @@ const getCategoryBreakdown = async (req, res, next) => {
 
     const { startDate, endDate } = getMonthDateRange(m, y);
 
-    const expenses = await Expense.find({
-      userId,
-      date: { $gte: startDate, $lte: endDate },
+    const snapshot = await db.collection('expenses')
+      .where('userId', '==', userId)
+      .get();
+
+    let expenses = [];
+    snapshot.forEach((doc) => {
+      const data = doc.data();
+      const date = new Date(data.date);
+      if (date >= startDate && date <= endDate) {
+        expenses.push(data);
+      }
     });
 
     const categoryTotals = {};
@@ -233,25 +281,43 @@ const getCategoryBreakdown = async (req, res, next) => {
 // @access  Private
 const getTrends = async (req, res, next) => {
   try {
-    const userId = req.user._id;
+    const userId = req.user._id.toString();
     const now = new Date();
     const currentYear = now.getFullYear();
 
     const result = [];
+
+    const incomesSnapshot = await db.collection('incomes')
+      .where('userId', '==', userId)
+      .get();
+      
+    const expensesSnapshot = await db.collection('expenses')
+      .where('userId', '==', userId)
+      .get();
+
+    let allIncomes = [];
+    incomesSnapshot.forEach((doc) => {
+      allIncomes.push(doc.data());
+    });
+
+    let allExpenses = [];
+    expensesSnapshot.forEach((doc) => {
+      allExpenses.push(doc.data());
+    });
 
     // Loop through 12 months of current year
     for (let month = 1; month <= 12; month++) {
       const monthName = new Date(currentYear, month - 1, 1).toLocaleString('default', { month: 'short' });
       const { startDate, endDate } = getMonthDateRange(month, currentYear);
 
-      const incomes = await Income.find({
-        userId,
-        date: { $gte: startDate, $lte: endDate },
+      const incomes = allIncomes.filter(inc => {
+        const date = new Date(inc.date);
+        return date >= startDate && date <= endDate;
       });
 
-      const expenses = await Expense.find({
-        userId,
-        date: { $gte: startDate, $lte: endDate },
+      const expenses = allExpenses.filter(exp => {
+        const date = new Date(exp.date);
+        return date >= startDate && date <= endDate;
       });
 
       const incomeTotal = incomes.reduce((sum, item) => sum + item.amount, 0);

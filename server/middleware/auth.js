@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const { db } = require('../config/db');
 
 const protect = async (req, res, next) => {
   let token;
@@ -16,12 +16,15 @@ const protect = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET || 'financeflow_jwt_secret_dev_key_123456789');
 
       // Get user from the token, exclude password
-      req.user = await User.findById(decoded.id).select('-password');
+      const userDoc = await db.collection('users').doc(decoded.id).get();
       
-      if (!req.user) {
+      if (!userDoc.exists) {
         return res.status(401).json({ success: false, message: 'Not authorized, user not found' });
       }
 
+      req.user = { _id: userDoc.id, ...userDoc.data() };
+      delete req.user.password;
+      
       next();
     } catch (error) {
       console.error(error);

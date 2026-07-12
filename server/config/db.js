@@ -1,51 +1,72 @@
-const mongoose = require('mongoose');
+const admin = require('firebase-admin');
+const path = require('path');
+const fs = require('fs');
 
-const runMigration = async () => {
-  try {
-    const User = require('../models/User');
-    const phoneRes = await User.updateMany({ phone: '' }, { $unset: { phone: "" } });
-    const firebaseRes = await User.updateMany({ firebaseUid: '' }, { $unset: { firebaseUid: "" } });
-    if (phoneRes.modifiedCount > 0 || firebaseRes.modifiedCount > 0) {
-      console.log(`Database migration complete. Cleaned up empty unique fields (Phone modified: ${phoneRes.modifiedCount}, Firebase modified: ${firebaseRes.modifiedCount}).`);
-    }
-  } catch (err) {
-    console.error(`Database migration failed: ${err.message}`);
-  }
-};
+const serviceAccountPath = path.join(__dirname, 'serviceAccountKey.json');
+let appInitialized = false;
 
-const connectDB = async () => {
-  const primaryUri = process.env.MONGO_URI;
-  const fallbackUri = 'mongodb://127.0.0.1:27017/financeflow';
-
-  // Check if primary URI exists and is not a placeholder
-  const isPlaceholder = primaryUri && primaryUri.includes('<db_password>');
-
-  if (primaryUri && !isPlaceholder) {
+// Check if Firebase admin app is already initialized
+if (admin.apps.length === 0) {
+  if (fs.existsSync(serviceAccountPath)) {
     try {
-      console.log('Attempting to connect to primary MongoDB Atlas...');
-      const conn = await mongoose.connect(primaryUri);
-      console.log(`MongoDB Connected (Primary): ${conn.connection.host}`);
-      await runMigration();
-      return;
+      const serviceAccount = require(serviceAccountPath);
+      admin.initializeApp({
+        credential: admin.credential.cert(serviceAccount)
+      });
+      console.log('Firebase Connected (Service Account JSON File)');
+      appInitialized = true;
     } catch (error) {
-      console.warn(`Primary MongoDB connection failed: ${error.message}`);
-      console.log('Attempting connection to local MongoDB fallback...');
+      console.error(`Failed to initialize Firebase with serviceAccountKey.json: ${error.message}`);
     }
-  } else if (isPlaceholder) {
-    console.warn('Primary MONGO_URI in .env contains placeholder <db_password>. Skipping primary connection.');
-    console.log('Attempting connection to local MongoDB...');
-  } else {
-    console.log('No primary MONGO_URI defined. Attempting connection to local MongoDB...');
   }
 
-  try {
-    const conn = await mongoose.connect(fallbackUri);
-    console.log(`MongoDB Connected (Local Fallback): ${conn.connection.host}`);
-    await runMigration();
-  } catch (error) {
-    console.error(`Error connecting to local MongoDB fallback: ${error.message}`);
-    process.exit(1);
+  if (!appInitialized) {
+    const projectId = process.env.FIREBASE_PROJECT_ID;
+    const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+    const privateKey = process.env.FIREBASE_PRIVATE_KEY;
+
+    if (projectId && clientEmail && privateKey) {
+      try {
+        const formattedPrivateKey = privateKey.replace(/\\n/g, '\n');
+        admin.initializeApp({
+          credential: admin.credential.cert({
+            projectId,
+            clientEmail,
+            privateKey: formattedPrivateKey
+          })
+        });
+        console.log('Firebase Connected (Environment Variables)');
+        appInitialized = true;
+      } catch (error) {
+        console.error(`Failed to initialize Firebase with environment variables: ${error.message}`);
+      }
+    }
+  }
+
+  if (!appInitialized) {
+    // Attempt default application credentials
+    try {
+      admin.initializeApp();
+      console.log('Firebase Connected (Default Application Credentials)');
+      appInitialized = true;
+    } catch (error) {
+      console.warn('Firebase default credentials not found. Database running in uninitialized mode.');
+    }
+  }
+} else {
+  appInitialized = true;
+}
+
+const db = admin.firestore();
+
+// connectDB wrapper to maintain compatibility with server.js startup
+const connectDB = async () => {
+  if (appInitialized) {
+    console.log('Firestore Database Connection established successfully.');
+  } else {
+    console.warn('WARNING: Firestore database not connected. Please check your credentials configuration.');
   }
 };
 
 module.exports = connectDB;
+module.exports.db = db;

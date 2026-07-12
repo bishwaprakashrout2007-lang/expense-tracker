@@ -116,3 +116,5 @@ public
 *.sw?
 .DS_Store
 Thumbs.db
+serviceAccountKey.json
+

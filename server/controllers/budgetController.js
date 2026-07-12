@@ -1,5 +1,4 @@
-const Budget = require('../models/Budget');
-const Expense = require('../models/Expense');
+const { db } = require('../config/db');
 
 // @desc    Create or update monthly budget
 // @route   POST /api/budgets
@@ -7,23 +6,42 @@ const Expense = require('../models/Expense');
 const createOrUpdateBudget = async (req, res, next) => {
   try {
     const { month, year, totalBudget, categoryBudgets } = req.body;
-    const userId = req.user._id;
+    const userId = req.user._id.toString();
+    const m = parseInt(month);
+    const y = parseInt(year);
 
-    // Upsert logic: find if exists, then update, else create
-    let budget = await Budget.findOne({ userId, month, year });
+    const budgetsRef = db.collection('budgets');
+    
+    // Find if budget exists
+    const query = await budgetsRef
+      .where('userId', '==', userId)
+      .where('month', '==', m)
+      .where('year', '==', y)
+      .limit(1)
+      .get();
 
-    if (budget) {
-      budget.totalBudget = totalBudget;
-      budget.categoryBudgets = categoryBudgets || {};
-      await budget.save();
+    let budget = null;
+    let budgetId = null;
+
+    const budgetData = {
+      userId,
+      month: m,
+      year: y,
+      totalBudget: parseFloat(totalBudget) || 0,
+      categoryBudgets: categoryBudgets || {},
+      updatedAt: new Date().toISOString()
+    };
+
+    if (!query.empty) {
+      const doc = query.docs[0];
+      budgetId = doc.id;
+      await budgetsRef.doc(budgetId).update(budgetData);
+      budget = { _id: budgetId, ...doc.data(), ...budgetData };
     } else {
-      budget = await Budget.create({
-        userId,
-        month,
-        year,
-        totalBudget,
-        categoryBudgets: categoryBudgets || {},
-      });
+      budgetData.createdAt = new Date().toISOString();
+      const docRef = await budgetsRef.add(budgetData);
+      budgetId = docRef.id;
+      budget = { _id: budgetId, ...budgetData };
     }
 
     res.status(201).json({
@@ -40,7 +58,20 @@ const createOrUpdateBudget = async (req, res, next) => {
 // @access  Private
 const getBudgets = async (req, res, next) => {
   try {
-    const budgets = await Budget.find({ userId: req.user._id }).sort({ year: -1, month: -1 });
+    const snapshot = await db.collection('budgets')
+      .where('userId', '==', req.user._id.toString())
+      .get();
+
+    let budgets = [];
+    snapshot.forEach((doc) => {
+      budgets.push({ _id: doc.id, ...doc.data() });
+    });
+
+    // Sort by year desc, month desc in memory
+    budgets.sort((a, b) => {
+      if (b.year !== a.year) return b.year - a.year;
+      return b.month - a.month;
+    });
 
     res.json({
       success: true,
@@ -58,20 +89,26 @@ const getBudgets = async (req, res, next) => {
 const getBudgetByMonth = async (req, res, next) => {
   try {
     const { month, year } = req.params;
-    const userId = req.user._id;
+    const userId = req.user._id.toString();
+    const m = parseInt(month);
+    const y = parseInt(year);
 
-    const budget = await Budget.findOne({
-      userId,
-      month: parseInt(month),
-      year: parseInt(year),
-    });
+    const query = await db.collection('budgets')
+      .where('userId', '==', userId)
+      .where('month', '==', m)
+      .where('year', '==', y)
+      .limit(1)
+      .get();
 
-    if (!budget) {
+    if (query.empty) {
       return res.json({
         success: true,
-        data: null, // Return null instead of error to let frontend know no budget exists yet
+        data: null,
       });
     }
+
+    const doc = query.docs[0];
+    const budget = { _id: doc.id, ...doc.data() };
 
     res.json({
       success: true,
@@ -87,16 +124,17 @@ const getBudgetByMonth = async (req, res, next) => {
 // @access  Private
 const deleteBudget = async (req, res, next) => {
   try {
-    const budget = await Budget.findOne({ _id: req.params.id, userId: req.user._id });
+    const docRef = db.collection('budgets').doc(req.params.id);
+    const doc = await docRef.get();
 
-    if (!budget) {
+    if (!doc.exists || doc.data().userId !== req.user._id.toString()) {
       return res.status(404).json({
         success: false,
         message: 'Budget record not found',
       });
     }
 
-    await Budget.findByIdAndDelete(req.params.id);
+    await docRef.delete();
 
     res.json({
       success: true,
@@ -113,22 +151,41 @@ const deleteBudget = async (req, res, next) => {
 const getBudgetStatus = async (req, res, next) => {
   try {
     const { month, year } = req.params;
-    const userId = req.user._id;
+    const userId = req.user._id.toString();
     
     const m = parseInt(month);
     const y = parseInt(year);
 
     // Get budget
-    const budget = await Budget.findOne({ userId, month: m, year: y });
+    const budgetQuery = await db.collection('budgets')
+      .where('userId', '==', userId)
+      .where('month', '==', m)
+      .where('year', '==', y)
+      .limit(1)
+      .get();
 
-    // Define dates for aggregation
+    let budget = null;
+    if (!budgetQuery.empty) {
+      const doc = budgetQuery.docs[0];
+      budget = { _id: doc.id, ...doc.data() };
+    }
+
+    // Define dates for filtering
     const startDate = new Date(y, m - 1, 1);
     const endDate = new Date(y, m, 0, 23, 59, 59, 999);
 
     // Get expenses of this month
-    const expenses = await Expense.find({
-      userId,
-      date: { $gte: startDate, $lte: endDate },
+    const expensesSnapshot = await db.collection('expenses')
+      .where('userId', '==', userId)
+      .get();
+
+    let expenses = [];
+    expensesSnapshot.forEach((doc) => {
+      const data = doc.data();
+      const expDate = new Date(data.date);
+      if (expDate >= startDate && expDate <= endDate) {
+        expenses.push({ _id: doc.id, ...data });
+      }
     });
 
     // Total monthly spending
@@ -157,13 +214,12 @@ const getBudgetStatus = async (req, res, next) => {
 
     // Map limits to spending
     const categoriesStatus = [];
-    const definedCategoryBudgets = budget.categoryBudgets || new Map();
+    const definedCategoryBudgets = budget.categoryBudgets || {};
 
-    // All categories of expenses
     const allCategories = ['Food', 'Transport', 'Shopping', 'Education', 'Entertainment', 'Bills', 'Other'];
 
     allCategories.forEach((cat) => {
-      const limit = definedCategoryBudgets.get ? (definedCategoryBudgets.get(cat) || 0) : (definedCategoryBudgets[cat] || 0);
+      const limit = definedCategoryBudgets[cat] || 0;
       const spent = categorySpending[cat] || 0;
       const percentage = limit > 0 ? parseFloat(((spent / limit) * 100).toFixed(2)) : 0;
       
