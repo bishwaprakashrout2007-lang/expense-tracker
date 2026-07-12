@@ -57,14 +57,16 @@ if (admin.apps.length === 0) {
   }
 
   if (!appInitialized) {
-    // Attempt default application credentials
-    try {
-      admin.initializeApp();
-      console.log('Firebase Connected (Default Application Credentials)');
-      appInitialized = true;
-    } catch (error) {
-      console.warn('Firebase default credentials not found. Database running in uninitialized mode.');
-    }
+    console.error('\n==================================================================');
+    console.error('ERROR: Firebase Credentials Not Found!');
+    console.error('Please make sure you have either:');
+    console.error('1. Placed your downloaded "serviceAccountKey.json" in your server/ or root/ folder.');
+    console.error('2. Set the environment variables:');
+    console.error('   - FIREBASE_PROJECT_ID');
+    console.error('   - FIREBASE_CLIENT_EMAIL');
+    console.error('   - FIREBASE_PRIVATE_KEY');
+    console.error('==================================================================\n');
+    throw new Error('Firebase credentials missing. Please refer to walkthrough.md for setup instructions.');
   }
 } else {
   appInitialized = true;
